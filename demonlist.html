@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SMITE GDPS Demon List</title>
+    <style>
+        /* Основные стили */
+        body {
+            font-family: 'Arial', sans-serif;
+            background: #121212;
+            color: #fff;
+            margin: 0;
+            padding: 20px;
+            background-image: linear-gradient(to bottom, #000000, #1a1a2e);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Стили для полей ввода */
+        input, select, textarea {
+            color: white !important;
+            background: #333 !important;
+            border: 1px solid #444 !important;
+            padding: 8px;
+            border-radius: 4px;
+            width: 100%;
+            margin: 5px 0;
+        }
+
+        ::placeholder {
+            color: #aaa !important;
+            opacity: 1;
+        }
+
+        /* Стили сложностей */
+        .difficulty-easy { color: #60D060; }
+        .difficulty-medium { color: #F0F060; }
+        .difficulty-hard { color: #FFA040; }
+        .difficulty-insane { color: #FF6060; }
+        .difficulty-extreme {
+            color: #FF0000;
+            text-shadow: 0 0 5px #FF0000;
+            animation: pulse 1s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 0.8; }
+            50% { opacity: 1; }
+            100% { opacity: 0.8; }
+        }
+
+        /* Таблица и кнопки */
+        .table-container {
+            width: 90%;
+            max-width: 800px;
+            margin: 0 auto;
+            overflow-x: auto;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(255, 85, 85, 0.3);
+            margin-bottom: 40px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 600px;
+        }
+
+        th {
+            background: linear-gradient(to right, #FF5555, #FF0000);
+            color: #000;
+            padding: 12px;
+            text-align: left;
+        }
+
+        td, th {
+            border: 1px solid #444;
+            padding: 10px;
+        }
+
+        .action-btn {
+            padding: 5px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 0 3px;
+        }
+
+        .delete-btn {
+            background: #FF3333;
+            color: white;
+            border: none;
+        }
+
+        /* Формы */
+        .form-panel {
+            background: rgba(0, 0, 0, 0.5);
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px auto;
+            width: 90%;
+            max-width: 800px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        /* Админ-тег */
+        .admin-tag {
+            background: #FF0000;
+            color: white;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 0.8em;
+            margin-left: 5px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Система аккаунтов -->
+    <div id="userInfo" style="text-align: right; padding: 10px;">
+        <a href="#" onclick="showAuthForm()">Войти</a>
+    </div>
+
+    <div class="header">
+        <h1>🔺 SMITE GDPS DEMON LIST 🔺</h1>
+        <div style="background: linear-gradient(45deg, #FF5555, #FF0000); color: white; padding: 5px 15px; border-radius: 20px; display: inline-block; font-weight: bold; margin: 10px 0; box-shadow: 0 0 10px rgba(255, 0, 0, 0.5);">
+            ОФИЦИАЛЬНЫЙ ДЕМОН-ЛИСТ SMITE GDPS
+        </div>
+    </div>
+    
+    <!-- Таблица уровней -->
+    <div class="table-container">
+        <table id="demonTable">
+            <tr>
+                <th>#</th>
+                <th>Название</th>
+                <th>Сложность</th>
+                <th>Автор</th>
+                <th>Действия</th>
+            </tr>
+        </table>
+    </div>
+
+    <!-- Форма добавления уровня -->
+    <div id="addLevelForm" class="form-panel" style="display: none;">
+        <h3>Добавить уровень</h3>
+        <div class="form-group">
+            <label>Название:</label>
+            <input type="text" id="levelName" placeholder="Введите название" required>
+        </div>
+        <div class="form-group">
+            <label>Сложность:</label>
+            <select id="levelDifficulty">
+                <option value="difficulty-easy">Easy Demon</option>
+                <option value="difficulty-medium">Medium Demon</option>
+                <option value="difficulty-hard">Hard Demon</option>
+                <option value="difficulty-insane">Insane Demon</option>
+                <option value="difficulty-extreme">Extreme Demon</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label>Автор:</label>
+            <input type="text" id="levelAuthor" placeholder="Введите автора" required>
+        </div>
+        <button onclick="addLevel()" style="margin-top: 10px;">Добавить</button>
+    </div>
+
+    <!-- Форма авторизации -->
+    <div id="authForm" class="form-panel" style="display: none;">
+        <h3>Вход</h3>
+        <div class="form-group">
+            <label>Ник:</label>
+            <input type="text" id="username" placeholder="Ваш никнейм" required>
+        </div>
+        <div class="form-group">
+            <label>Пароль:</label>
+            <input type="password" id="password" placeholder="Ваш пароль" required>
+        </div>
+        <button onclick="login()">Войти</button>
+        <button onclick="register()">Регистрация</button>
+        <button onclick="logout()" style="margin-top: 10px; background: #444;">Выйти</button>
+    </div>
+
+    <script>
+        // Админ-аккаунты
+        const ADMINS = {
+            "Murat Animator": "Adm!n@S3cur3#2024",
+            "Мурат": "SysAdm!nP@ssw0rd"
+        };
+
+        // Инициализация
+        document.addEventListener('DOMContentLoaded', function() {
+            initStorage();
+            loadLevels();
+            checkAuth();
+        });
+
+        function initStorage() {
+            if (!localStorage.getItem('demonLevels')) {
+                localStorage.setItem('demonLevels', JSON.stringify([
+                    { position: 1, name: "Bloodbath", difficulty: "difficulty-extreme", author: "Riot" },
+                    { position: 2, name: "Cataclysm", difficulty: "difficulty-extreme", author: "Ggb0y" }
+                ]));
+            }
+            if (!localStorage.getItem('users')) {
+                localStorage.setItem('users', JSON.stringify([]));
+            }
+        }
+
+        function loadLevels() {
+            const table = document.getElementById('demonTable');
+            while (table.rows.length > 1) table.deleteRow(1);
+            
+            const levels = JSON.parse(localStorage.getItem('demonLevels')) || [];
+            levels.forEach(level => addTableRow(level));
+        }
+
+        function addTableRow(level) {
+            const table = document.getElementById('demonTable');
+            const row = table.insertRow();
+            
+            row.insertCell(0).textContent = level.position;
+            row.insertCell(1).textContent = level.name;
+            
+            const diffCell = row.insertCell(2);
+            diffCell.textContent = getDifficultyText(level.difficulty);
+            diffCell.className = level.difficulty;
+            
+            row.insertCell(3).textContent = level.author;
+            
+            const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+            if (currentUser?.isAdmin) {
+                const actionCell = row.insertCell(4);
+                actionCell.innerHTML = `<button class="action-btn delete-btn" onclick="deleteLevel(${level.position})">Удалить</button>`;
+            }
+        }
+
+        function deleteLevel(position) {
+            if (!confirm("Удалить уровень?")) return;
+            
+            let levels = JSON.parse(localStorage.getItem('demonLevels'));
+            levels = levels.filter(l => l.position !== position)
+                         .map((l, i) => ({ ...l, position: i + 1 }));
+            
+            localStorage.setItem('demonLevels', JSON.stringify(levels));
+            loadLevels();
+        }
+
+        function addLevel() {
+            const name = document.getElementById('levelName').value.trim();
+            const difficulty = document.getElementById('levelDifficulty').value;
+            const author = document.getElementById('levelAuthor').value.trim();
+            
+            if (!name || !author) return alert("Заполните все поля!");
+            
+            const levels = JSON.parse(localStorage.getItem('demonLevels'));
+            const newLevel = {
+                position: levels.length + 1,
+                name,
+                difficulty,
+                author
+            };
+            
+            levels.push(newLevel);
+            localStorage.setItem('demonLevels', JSON.stringify(levels));
+            loadLevels();
+            
+            document.getElementById('levelName').value = '';
+            document.getElementById('levelAuthor').value = '';
+        }
+
+        function checkAuth() {
+            const user = JSON.parse(localStorage.getItem('currentUser'));
+            const userInfo = document.getElementById('userInfo');
+            const addForm = document.getElementById('addLevelForm');
+            
+            if (user) {
+                userInfo.innerHTML = `${user.username} ${user.isAdmin ? '<span class="admin-tag">ADMIN</span>' : ''} | <a href="#" onclick="logout()">Выйти</a>`;
+                addForm.style.display = user.isAdmin ? 'block' : 'none';
+            } else {
+                userInfo.innerHTML = '<a href="#" onclick="showAuthForm()">Войти</a>';
+                addForm.style.display = 'none';
+            }
+            loadLevels();
+        }
+
+        function login() {
+            const username = document.getElementById('username').value.trim();
+            const password = document.getElementById('password').value;
+            
+            if (ADMINS[username] === password) {
+                localStorage.setItem('currentUser', JSON.stringify({ username, isAdmin: true }));
+                alert("Добро пожаловать, админ!");
+            } else {
+                const users = JSON.parse(localStorage.getItem('users'));
+                const user = users.find(u => u.username === username && u.password === password);
+                if (!user) return alert("Ошибка входа!");
+                localStorage.setItem('currentUser', JSON.stringify({ username, isAdmin: false }));
+            }
+            
+            document.getElementById('authForm').style.display = 'none';
+            checkAuth();
+        }
+
+        function register() {
+            const username = document.getElementById('username').value.trim();
+            const password = document.getElementById('password').value;
+            
+            if (ADMINS[username]) return alert("Этот ник занят!");
+            
+            const users = JSON.parse(localStorage.getItem('users'));
+            if (users.some(u => u.username === username)) return alert("Ник уже используется!");
+            
+            users.push({ username, password });
+            localStorage.setItem('users', JSON.stringify(users));
+            alert("Регистрация успешна!");
+        }
+
+        function logout() {
+            localStorage.removeItem('currentUser');
+            checkAuth();
+        }
+
+        function showAuthForm() {
+            document.getElementById('authForm').style.display = 'block';
+        }
+
+        function getDifficultyText(difficulty) {
+            const texts = {
+                'difficulty-easy': 'Easy Demon',
+                'difficulty-medium': 'Medium Demon',
+                'difficulty-hard': 'Hard Demon',
+                'difficulty-insane': 'Insane Demon',
+                'difficulty-extreme': 'Extreme Demon ⚠️'
+            };
+            return texts[difficulty] || 'Unknown';
+        }
+    </script>
+</body>
+</html>
