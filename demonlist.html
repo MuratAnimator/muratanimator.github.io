@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SMITE GDPS Demon List</title>
     <style>
-        /* Основные стили */
         body {
             font-family: 'Arial', sans-serif;
             background: #121212;
@@ -18,7 +17,6 @@
             flex-direction: column;
         }
 
-        /* Стили для полей ввода */
         input, select, textarea {
             color: white !important;
             background: #333 !important;
@@ -34,7 +32,6 @@
             opacity: 1;
         }
 
-        /* Стили сложностей */
         .difficulty-easy { color: #60D060; }
         .difficulty-medium { color: #F0F060; }
         .difficulty-hard { color: #FFA040; }
@@ -51,7 +48,6 @@
             100% { opacity: 0.8; }
         }
 
-        /* Таблица и кнопки */
         .table-container {
             width: 90%;
             max-width: 800px;
@@ -93,7 +89,6 @@
             border: none;
         }
 
-        /* Формы */
         .form-panel {
             background: rgba(0, 0, 0, 0.5);
             padding: 20px;
@@ -107,7 +102,6 @@
             margin-bottom: 15px;
         }
 
-        /* Админ-тег */
         .admin-tag {
             background: #FF0000;
             color: white;
@@ -116,10 +110,28 @@
             font-size: 0.8em;
             margin-left: 5px;
         }
+        
+        .export-btn {
+            background: #555;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 4px;
+            margin-top: 10px;
+            cursor: pointer;
+        }
+        
+        .sync-notice {
+            background: rgba(0, 100, 255, 0.3);
+            padding: 10px;
+            border-radius: 5px;
+            text-align: center;
+            margin: 10px auto;
+            max-width: 800px;
+        }
     </style>
 </head>
 <body>
-    <!-- Система аккаунтов -->
     <div id="userInfo" style="text-align: right; padding: 10px;">
         <a href="#" onclick="showAuthForm()">Войти</a>
     </div>
@@ -131,7 +143,11 @@
         </div>
     </div>
     
-    <!-- Таблица уровней -->
+    <div class="sync-notice">
+        Данные обновляются автоматически при загрузке страницы
+        <button onclick="loadDataFromGitHub()" style="background: #444; color: white; border: none; padding: 5px 10px; border-radius: 3px; margin-left: 10px;">Обновить сейчас</button>
+    </div>
+    
     <div class="table-container">
         <table id="demonTable">
             <tr>
@@ -144,7 +160,6 @@
         </table>
     </div>
 
-    <!-- Форма добавления уровня -->
     <div id="addLevelForm" class="form-panel" style="display: none;">
         <h3>Добавить уровень</h3>
         <div class="form-group">
@@ -166,9 +181,9 @@
             <input type="text" id="levelAuthor" placeholder="Введите автора" required>
         </div>
         <button onclick="addLevel()" style="margin-top: 10px;">Добавить</button>
+        <button class="export-btn" onclick="exportData()">Экспорт данных (для GitHub)</button>
     </div>
 
-    <!-- Форма авторизации -->
     <div id="authForm" class="form-panel" style="display: none;">
         <h3>Вход</h3>
         <div class="form-group">
@@ -184,18 +199,30 @@
         <button onclick="logout()" style="margin-top: 10px; background: #444;">Выйти</button>
     </div>
 
+    <div class="footer">
+        <div style="text-align: center; margin-top: auto; padding: 20px; background: rgba(0, 0, 0, 0.7); border-radius: 10px; width: 90%; max-width: 800px; margin-left: auto; margin-right: auto; margin-bottom: 20px;">
+            <div style="font-size: 1em; color: #aaa; line-height: 1.6;">
+                Следит за списком: <span style="color: #FF5555; font-weight: bold;">Murat Animator (Мурат)</span><br>
+                Хостит: <span style="color: #FF5555; font-weight: bold;">Smite GDPS</span>
+            </div>
+        </div>
+    </div>
+
     <script>
         // Админ-аккаунты
         const ADMINS = {
             "Murat Animator": "Adm!n@S3cur3#2024",
-            "Starsy": "14072011starsyraf"
+            "Starsy": "14072011starsyraf",
             "Smite": "25kk"
         };
+        
+        // URL для данных на GitHub (ЗАМЕНИТЕ НА СВОЙ!)
+        const GITHUB_DATA_URL = 'https://raw.githubusercontent.com/ваш-логин/ваш-репозиторий/main/demonlist-data.json';
 
         // Инициализация
         document.addEventListener('DOMContentLoaded', function() {
             initStorage();
-            loadLevels();
+            loadDataFromGitHub();
             checkAuth();
         });
 
@@ -208,6 +235,32 @@
             }
             if (!localStorage.getItem('users')) {
                 localStorage.setItem('users', JSON.stringify([]));
+            }
+        }
+
+        // Загрузка данных с GitHub
+        async function loadDataFromGitHub() {
+            try {
+                const response = await fetch(GITHUB_DATA_URL);
+                if (!response.ok) throw new Error("Ошибка загрузки данных");
+                
+                const data = await response.json();
+                
+                // Сохраняем полученные данные
+                localStorage.setItem('demonLevels', JSON.stringify(data.levels));
+                localStorage.setItem('users', JSON.stringify(data.users || []));
+                
+                // Обновляем таблицу
+                loadLevels();
+                
+                document.querySelector('.sync-notice').textContent = '✅ Данные успешно синхронизированы с GitHub';
+                setTimeout(() => {
+                    document.querySelector('.sync-notice').textContent = 'Данные обновляются автоматически при загрузке страницы';
+                }, 3000);
+            } catch (error) {
+                console.error("Ошибка синхронизации:", error);
+                document.querySelector('.sync-notice').textContent = '⚠️ Ошибка синхронизации. Используются локальные данные';
+                loadLevels();
             }
         }
 
@@ -338,6 +391,32 @@
                 'difficulty-extreme': 'Extreme Demon ⚠️'
             };
             return texts[difficulty] || 'Unknown';
+        }
+        
+        // Функция экспорта данных для GitHub
+        function exportData() {
+            const data = {
+                levels: JSON.parse(localStorage.getItem('demonLevels')),
+                users: JSON.parse(localStorage.getItem('users'))
+            };
+            
+            const jsonString = JSON.stringify(data, null, 2);
+            const blob = new Blob([jsonString], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'demonlist-data.json';
+            document.body.appendChild(a);
+            a.click();
+            
+            // Очистка
+            setTimeout(() => {
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+            }, 100);
+            
+            alert("✅ Файл demonlist-data.json скачан.\n\nЗАГРУЗИТЕ ЕГО В КОРЕНЬ РЕПОЗИТОРИЯ GITHUB:\n1. Перейдите в репозиторий GitHub\n2. Нажмите 'Add file' → 'Upload files'\n3. Перетащите скачанный файл\n4. Нажмите 'Commit changes'");
         }
     </script>
 </body>
