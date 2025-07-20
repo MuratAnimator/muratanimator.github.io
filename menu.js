@@ -216,8 +216,12 @@ function showOnlineMenu() {
 }
 
 function createRoom() {
-    AppState.peer = new Peer();
-    AppState.isHost = true;
+    AppState.peer = new Peer({
+  host: "amongus-peerjs.glitch.me", // уже настроенный сервер
+  secure: true,
+  port: 443,
+  path: "/peerjs"
+});
 
     AppState.peer.on('open', (id) => {
         const menuOptions = document.getElementById('menu-options');
