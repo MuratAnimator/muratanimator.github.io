@@ -216,11 +216,12 @@ function showOnlineMenu() {
 }
 
 function createRoom() {
-    AppState.peer = new Peer({
-  host: "amongus-peerjs.glitch.me", // уже настроенный сервер
+   AppState.peer = new Peer({
+  host: "amongus-p2p.fly.dev",
   secure: true,
   port: 443,
   path: "/peerjs"
+});
 });
 
     AppState.peer.on('open', (id) => {
