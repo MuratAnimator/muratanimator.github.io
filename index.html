@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Among Us Web</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Главное меню -->
+    <div id="main-menu" class="screen active">
+        <div class="menu-header">
+            <div class="logo">AMONG US</div>
+            <div class="version">САЙТ ВЕРСИЯ</div>
+        </div>
+        
+        <div class="menu-options" id="menu-options"></div>
+        
+        <div class="menu-footer">
+            <div class="player-info">
+                <div class="player-preview"></div>
+                <div class="player-name">Player</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Экран кастомизации -->
+    <div id="customize-screen" class="screen">
+        <div class="back-btn">← НАЗАД</div>
+        <div class="customize-container">
+            <h2>ВЫБРАТЬ ЦВЕТ</h2>
+            <div id="color-options" class="color-options"></div>
+        </div>
+    </div>
+
+    <!-- Экран настроек -->
+    <div id="settings-screen" class="screen">
+        <div class="back-btn">← НАЗАД</div>
+        <div class="settings-container">
+            <h2>НАСТРОЙКИ</h2>
+            
+            <div class="setting-group">
+                <label for="volume-slider">ГРОМКОСТЬ: <span id="volume-value">80</span>%</label>
+                <input type="range" id="volume-slider" min="0" max="100" value="80">
+            </div>
+            
+            <div class="setting-group">
+                <label for="nickname-input">NICKNAME:</label>
+                <input type="text" id="nickname-input" maxlength="10" placeholder="Player">
+            </div>
+            
+            <button id="save-settings" class="settings-btn">ПОТВЕРДИТЬ</button>
+        </div>
+    </div>
+
+    <script src="https://unpkg.com/peerjs@1.4.7/dist/peerjs.min.js"></script>
+    <script src="menu.js"></script>
+</body>
+</html>
