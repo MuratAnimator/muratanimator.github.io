@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GameStore — качай приложения и игры</title>
+  <!-- Font Awesome 5 (иконки) -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Segoe UI', Roboto, system-ui, -apple-system, sans-serif;
+    }
+
+    body {
+      background: linear-gradient(145deg, #0b0e14 0%, #141a24 100%);
+      min-height: 100vh;
+      color: #f0f4ff;
+      padding: 0 20px 40px;
+    }
+
+    .container {
+      max-width: 1300px;
+      margin: 0 auto;
+    }
+
+    /* Шапка */
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      padding: 24px 0 16px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 1.8rem;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+      background: linear-gradient(135deg, #b388ff, #82b1ff);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .logo i {
+      font-size: 2.2rem;
+      background: linear-gradient(135deg, #b388ff, #82b1ff);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .search-box {
+      display: flex;
+      background: rgba(255, 255, 255, 0.07);
+      backdrop-filter: blur(4px);
+      border-radius: 60px;
+      padding: 6px 6px 6px 20px;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      transition: 0.25s;
+    }
+
+    .search-box:focus-within {
+      background: rgba(255, 255, 255, 0.12);
+      border-color: #7c9bff;
+      box-shadow: 0 0 0 3px rgba(124, 155, 255, 0.2);
+    }
+
+    .search-box input {
+      background: transparent;
+      border: none;
+      padding: 10px 0;
+      font-size: 1rem;
+      color: #eef3ff;
+      width: 200px;
+      outline: none;
+    }
+
+    .search-box input::placeholder {
+      color: #9aa8c7;
+      font-weight: 300;
+    }
+
+    .search-box button {
+      background: #4c6fff;
+      border: none;
+      border-radius: 60px;
+      padding: 10px 22px;
+      color: white;
+      font-weight: 600;
+      font-size: 0.95rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: 0.2s;
+      letter-spacing: 0.3px;
+      box-shadow: 0 6px 14px rgba(76, 111, 255, 0.3);
+    }
+
+    .search-box button:hover {
+      background: #3a5be0;
+      transform: scale(1.02);
+      box-shadow: 0 8px 20px rgba(76, 111, 255, 0.5);
+    }
+
+    /* Фильтры / категории */
+    .categories {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px 16px;
+      margin: 28px 0 20px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+    }
+
+    .cat-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(255, 255, 255, 0.03);
+      padding: 8px 20px 8px 16px;
+      border-radius: 40px;
+      font-weight: 500;
+      font-size: 0.95rem;
+      color: #b8c9f0;
+      border: 1px solid transparent;
+      transition: 0.2s;
+      cursor: default;
+    }
+
+    .cat-item i {
+      font-size: 1rem;
+      color: #6d8cff;
+    }
+
+    .cat-item.active {
+      background: rgba(76, 111, 255, 0.18);
+      border-color: #4c6fff;
+      color: white;
+      box-shadow: 0 0 12px rgba(76, 111, 255, 0.15);
+    }
+
+    .cat-item.active i {
+      color: #b0c7ff;
+    }
+
+    .cat-item:not(.active):hover {
+      background: rgba(255, 255, 255, 0.07);
+      border-color: rgba(255, 255, 255, 0.1);
+    }
+
+    /* Сетка карточек */
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      gap: 28px 22px;
+      margin-top: 16px;
+    }
+
+    .card {
+      background: rgba(22, 30, 44, 0.7);
+      backdrop-filter: blur(6px);
+      border-radius: 28px;
+      padding: 24px 18px 20px;
+      border: 1px solid rgba(255, 255, 255, 0.04);
+      box-shadow: 0 12px 28px -8px rgba(0, 0, 0, 0.6);
+      transition: all 0.25s ease;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+    }
+
+    .card:hover {
+      transform: translateY(-6px);
+      border-color: rgba(76, 111, 255, 0.3);
+      background: rgba(28, 38, 56, 0.8);
+      box-shadow: 0 18px 36px -8px #0b0e14;
+    }
+
+    .card-icon {
+      font-size: 2.6rem;
+      background: rgba(76, 111, 255, 0.12);
+      width: 64px;
+      height: 64px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 20px;
+      margin-bottom: 16px;
+      color: #8aa4ff;
+      transition: 0.2s;
+    }
+
+    .card:hover .card-icon {
+      background: rgba(76, 111, 255, 0.2);
+      color: #b7ccff;
+    }
+
+    .card h3 {
+      font-size: 1.3rem;
+      font-weight: 600;
+      letter-spacing: -0.2px;
+      margin-bottom: 6px;
+      color: #f0f6ff;
+    }
+
+    .card .sub {
+      font-size: 0.85rem;
+      color: #8f9fc7;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .card .sub i {
+      font-size: 0.8rem;
+      color: #5f7bcb;
+    }
+
+    .card .desc {
+      font-size: 0.95rem;
+      line-height: 1.5;
+      color: #c6d3f0;
+      margin-bottom: 18px;
+      flex: 1;
+    }
+
+    .card .meta-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 6px;
+    }
+
+    .card .size {
+      font-size: 0.8rem;
+      color: #7688b0;
+      background: rgba(255, 255, 255, 0.04);
+      padding: 4px 12px;
+      border-radius: 30px;
+      border: 1px solid rgba(255, 255, 255, 0.02);
+    }
+
+    .card .download-btn {
+      background: #4c6fff;
+      border: none;
+      border-radius: 40px;
+      padding: 10px 18px;
+      font-weight: 600;
+      font-size: 0.9rem;
+      color: white;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+      transition: 0.2s;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      box-shadow: 0 4px 10px rgba(76, 111, 255, 0.25);
+      text-decoration: none;
+    }
+
+    .card .download-btn i {
+      font-size: 0.9rem;
+    }
+
+    .card .download-btn:hover {
+      background: #3a5de0;
+      transform: scale(1.03);
+      box-shadow: 0 8px 18px rgba(76, 111, 255, 0.4);
+    }
+
+    .card .download-btn:active {
+      transform: scale(0.97);
+    }
+
+    /* тег "популярное" */
+    .badge-popular {
+      position: absolute;
+      top: 16px;
+      right: 16px;
+      background: rgba(255, 190, 60, 0.15);
+      backdrop-filter: blur(4px);
+      color: #ffd966;
+      font-size: 0.7rem;
+      font-weight: 600;
+      padding: 4px 12px;
+      border-radius: 30px;
+      border: 1px solid rgba(255, 190, 60, 0.2);
+      letter-spacing: 0.3px;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .badge-popular i {
+      font-size: 0.6rem;
+    }
+
+    /* футер */
+    .footer-note {
+      margin-top: 50px;
+      text-align: center;
+      color: #62739b;
+      font-size: 0.9rem;
+      border-top: 1px solid rgba(255, 255, 255, 0.03);
+      padding-top: 30px;
+      letter-spacing: 0.3px;
+    }
+
+    .footer-note i {
+      color: #4f6fc7;
+      margin: 0 4px;
+    }
+
+    /* адаптив */
+    @media (max-width: 700px) {
+      header {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 18px;
+      }
+      .search-box {
+        width: 100%;
+      }
+      .search-box input {
+        width: 100%;
+      }
+      .search-box button {
+        padding: 10px 18px;
+        font-size: 0.9rem;
+      }
+      .logo {
+        font-size: 1.6rem;
+        justify-content: center;
+      }
+      .categories {
+        justify-content: center;
+      }
+      .grid {
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        gap: 18px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .grid {
+        grid-template-columns: 1fr 1fr;
+      }
+      .card .desc {
+        font-size: 0.85rem;
+      }
+      .card .download-btn {
+        padding: 8px 12px;
+        font-size: 0.8rem;
+      }
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+
+  <!-- HEADER -->
+  <header>
+    <div class="logo">
+      <i class="fas fa-gamepad"></i>
+      <span>GameStore</span>
+    </div>
+    <div class="search-box">
+      <input type="text" placeholder="Поиск игр, приложений...">
+      <button><i class="fas fa-search"></i> Найти</button>
+    </div>
+  </header>
+
+  <!-- КАТЕГОРИИ -->
+  <div class="categories">
+    <span class="cat-item active"><i class="fas fa-fire"></i> Все</span>
+    <span class="cat-item"><i class="fas fa-chess-queen"></i> Игры</span>
+    <span class="cat-item"><i class="fas fa-cog"></i> Инструменты</span>
+    <span class="cat-item"><i class="fas fa-photo-video"></i> Медиа</span>
+    <span class="cat-item"><i class="fas fa-graduation-cap"></i> Образование</span>
+    <span class="cat-item"><i class="fas fa-rocket"></i> Топ</span>
+  </div>
+
+  <!-- СЕТКА КАРТОЧЕК -->
+  <div class="grid" id="appGrid">
+
+    <!-- Карточка 1: ElyPrismLauncher -->
+    <div class="card">
+      <span class="badge-popular"><i class="fas fa-star"></i> Популярное</span>
+      <div class="card-icon"><i class="fas fa-crown"></i></div>
+      <h3>ElyPrismLauncher</h3>
+      <div class="sub"><i class="fas fa-tag"></i> RPG, Лаунчер</div>
+      <div class="desc">Бриллиант среди лаунчеров Minecraft. Лёгкий, быстрый и удобный.</div>
+      <div class="meta-row">
+        <span class="size"><i class="far fa-hdd"></i> 1,19 МБ</span>
+        <!-- ↓↓↓ РЕАЛЬНАЯ ССЫЛКА НА СКАЧИВАНИЕ ↓↓↓ -->
+        <a href="games/ElyPrismLauncher.exe" download class="download-btn">
+          <i class="fas fa-cloud-download-alt"></i> Скачать
+        </a>
+      </div>
+    </div>
+
+    <!-- Карточка 2: MindFlow -->
+    <div class="card">
+      <div class="card-icon"><i class="fas fa-brain"></i></div>
+      <h3>MindFlow</h3>
+      <div class="sub"><i class="fas fa-tag"></i> Продуктивность</div>
+      <div class="desc">Приложение для медитации и фокуса. Ежедневные практики, звуки природы и трекер настроения.</div>
+      <div class="meta-row">
+        <span class="size"><i class="far fa-hdd"></i> 210 МБ</span>
+        <a href="games/MindFlow.apk" download class="download-btn">
+          <i class="fas fa-cloud-download-alt"></i> Скачать
+        </a>
+      </div>
+    </div>
+
+    <!-- Карточка 3: Dark Echo -->
+    <div class="card">
+      <span class="badge-popular"><i class="fas fa-star"></i> Популярное</span>
+      <div class="card-icon"><i class="fas fa-ghost"></i></div>
+      <h3>Dark Echo</h3>
+      <div class="sub"><i class="fas fa-tag"></i> Хоррор, Приключение</div>
+      <div class="desc">Атмосферный хоррор с уникальной механикой звука. Исследуйте заброшенный особняк.</div>
+      <div class="meta-row">
+        <span class="size"><i class="far fa-hdd"></i> 920 МБ</span>
+        <a href="games/DarkEcho.zip" download class="download-btn">
+          <i class="fas fa-cloud-download-alt"></i> Скачать
+        </a>
+      </div>
+    </div>
+
+    <!-- Карточка 4: SnapEdit Pro -->
+    <div class="card">
+      <div class="card-icon"><i class="fas fa-camera-retro"></i></div>
+      <h3>SnapEdit Pro</h3>
+      <div class="sub"><i class="fas fa-tag"></i> Фото, Редактор</div>
+      <div class="desc">Мощный редактор фото с нейросетями: удаление объектов, ретушь, фильтры и цветокоррекция.</div>
+      <div class="meta-row">
+        <span class="size"><i class="far fa-hdd"></i> 450 МБ</span>
+        <a href="games/SnapEditPro.apk" download class="download-btn">
+          <i class="fas fa-cloud-download-alt"></i> Скачать
+        </a>
+      </div>
+    </div>
+
+    <!-- Карточка 5: AI Writer -->
+    <div class="card">
+      <div class="card-icon"><i class="fas fa-robot"></i></div>
+      <h3>AI Writer</h3>
+      <div class="sub"><i class="fas fa-tag"></i> Инструменты</div>
+      <div class="desc">Генератор текстов на основе ИИ. Помощь в написании статей, идей, писем и сценариев.</div>
+      <div class="meta-row">
+        <span class="size"><i class="far fa-hdd"></i> 340 МБ</span>
+        <a href="games/AIWriter.exe" download class="download-btn">
+          <i class="fas fa-cloud-download-alt"></i> Скачать
+        </a>
+      </div>
+    </div>
+
+    <!-- Карточка 6: Speed Racer X -->
+    <div class="card">
+      <span class="badge-popular"><i class="fas fa-star"></i> Популярное</span>
+      <div class="card-icon"><i class="fas fa-bolt"></i></div>
+      <h3>Speed Racer X</h3>
+      <div class="sub"><i class="fas fa-tag"></i> Гонки, Аркада</div>
+      <div class="desc">Динамичные гонки на футуристических трассах. Турбо-ускорения, дрифт и онлайн-таблица лидеров.</div>
+      <div class="meta-row">
+        <span class="size"><i class="far fa-hdd"></i> 1.2 ГБ</span>
+        <a href="games/SpeedRacerX.exe" download class="download-btn">
+          <i class="fas fa-cloud-download-alt"></i> Скачать
+        </a>
+      </div>
+    </div>
+
+    <!-- Карточка 7: BeatStudio -->
+    <div class="card">
+      <div class="card-icon"><i class="fas fa-music"></i></div>
+      <h3>BeatStudio</h3>
+      <div class="sub"><i class="fas fa-tag"></i> Музыка, Создание</div>
+      <div class="desc">Создавайте биты и треки в студийном качестве. Встроенные сэмплы, драм-машина и микшер.</div>
+      <div class="meta-row">
+        <span class="size"><i class="far fa-hdd"></i> 610 МБ</span>
+        <a href="games/BeatStudio.exe" download class="download-btn">
+          <i class="fas fa-cloud-download-alt"></i> Скачать
+        </a>
+      </div>
+    </div>
+
+    <!-- Карточка 8: MathLab -->
+    <div class="card">
+      <div class="card-icon"><i class="fas fa-calculator"></i></div>
+      <h3>MathLab</h3>
+      <div class="sub"><i class="fas fa-tag"></i> Обучение, Наука</div>
+      <div class="desc">Интерактивный задачник по математике. Пошаговые решения, графики и теория для всех классов.</div>
+      <div class="meta-row">
+        <span class="size"><i class="far fa-hdd"></i> 180 МБ</span>
+        <a href="games/MathLab.apk" download class="download-btn">
+          <i class="fas fa-cloud-download-alt"></i> Скачать
+        </a>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ФУТЕР -->
+  <div class="footer-note">
+    <i class="fas fa-download"></i> Более 2000 приложений и игр · Качай безопасно <i class="fas fa-shield-alt"></i> · 2026
+  </div>
+
+</div>
+
+<!-- ✅ ИСПРАВЛЕННЫЙ СКРИПТ — реальное скачивание + анимация -->
+<script>
+  (function() {
+    // Находим все кнопки скачивания
+    const btns = document.querySelectorAll('.download-btn');
+    
+    btns.forEach(btn => {
+      btn.addEventListener('click', function(e) {
+        // НЕ блокируем стандартное поведение — файл скачивается!
+        // Просто добавляем анимацию загрузки
+        
+        const originalHTML = this.innerHTML;
+        this.innerHTML = '<i class="fas fa-spinner fa-pulse"></i> Загрузка...';
+        this.style.pointerEvents = 'none';
+        this.style.opacity = '0.7';
+        
+        // Через 3 секунды возвращаем кнопку в исходное состояние
+        setTimeout(() => {
+          this.innerHTML = originalHTML;
+          this.style.pointerEvents = 'auto';
+          this.style.opacity = '1';
+        }, 3000);
+      });
+    });
+
+    // Фильтры (подсветка категорий)
+    const catItems = document.querySelectorAll('.cat-item');
+    catItems.forEach(item => {
+      item.addEventListener('click', function() {
+        catItems.forEach(c => c.classList.remove('active'));
+        this.classList.add('active');
+      });
+    });
+
+    // Поиск (демо)
+    const searchBtn = document.querySelector('.search-box button');
+    const searchInput = document.querySelector('.search-box input');
+    if (searchBtn) {
+      searchBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+        const query = searchInput.value.trim();
+        if (query === '') {
+          alert('Введите название игры или приложения');
+        } else {
+          alert(`Поиск: "${query}"\n(демо-режим, показаны все результаты)`);
+        }
+      });
+    }
+    if (searchInput) {
+      searchInput.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          searchBtn.click();
+        }
+      });
+    }
+  })();
+</script>
+
+</body>
+</html>
